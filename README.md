@@ -13,7 +13,7 @@ All endpoints are secured with JWT authentication.
 
 ---
 
-## Design
+## Design and TradeOffs
 - **Layers:** The code is split into handlers (HTTP layer), middleware (auth), and repository (data access). 
 - **In-Memory vs SQLite:**  
   - Default: In-memory map (simple, fast, resets on restart).  
