@@ -16,23 +16,23 @@ func ListServicesHandler(repo repository.ServiceRepository) http.HandlerFunc {
 		q := r.URL.Query()
 		search := q.Get("search")
 		sortBy := q.Get("sort")
-		if sortBy == "" {
+		if sortBy != "name" && sortBy != "id" {
 			sortBy = "id"
 		}
 		order := q.Get("order")
-		if order != "desc" {
+		if order != "desc" && order != "asc" {
 			order = "asc"
 		}
 
 		limit := 10
 		if l := q.Get("limit"); l != "" {
-			if v, err := strconv.Atoi(l); err == nil {
+			if v, err := strconv.Atoi(l); err == nil && v > 0 && v <= 100 {
 				limit = v
 			}
 		}
 		offset := 0
 		if o := q.Get("offset"); o != "" {
-			if v, err := strconv.Atoi(o); err == nil {
+			if v, err := strconv.Atoi(o); err == nil && v >= 0 {
 				offset = v
 			}
 		}

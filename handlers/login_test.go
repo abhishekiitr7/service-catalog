@@ -8,7 +8,7 @@ import (
 )
 
 func TestLoginHandler(t *testing.T) {
-	jwtSecret = []byte("testsecret")
+	SetJWTSecretForTesting([]byte("test_secret_key_32_characters_long"))
 
 	tests := []struct {
 		name       string

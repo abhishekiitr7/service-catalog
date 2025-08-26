@@ -3,15 +3,15 @@ package middleware
 import (
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
 	"github.com/golang-jwt/jwt/v4"
 )
 
 func TestAuthMiddleware(t *testing.T) {
-	secret := []byte("testsecret")
-	os.Setenv("JWT_SECRET", string(secret))
+	secret := []byte("test_secret_key_32_characters_long")
+	SetJWTSecretForTesting(secret)
+	
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"user": "abc"})
 	tokenString, _ := token.SignedString(secret)
 

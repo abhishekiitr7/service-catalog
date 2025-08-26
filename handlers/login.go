@@ -11,6 +11,24 @@ import (
 
 var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
+func init() {
+	validateJWTSecret()
+}
+
+func validateJWTSecret() {
+	if len(jwtSecret) == 0 {
+		panic("JWT_SECRET environment variable is required")
+	}
+	if len(jwtSecret) < 32 {
+		panic("JWT_SECRET must be at least 32 characters long for security")
+	}
+}
+
+// SetJWTSecretForTesting allows tests to override the JWT secret
+func SetJWTSecretForTesting(secret []byte) {
+	jwtSecret = secret
+}
+
 type LoginRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
@@ -18,11 +36,24 @@ type LoginRequest struct {
 
 // LoginHandler creates a JWT token for valid credential.
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	// Limit request body size to prevent large payload attacks
+	r.Body = http.MaxBytesReader(w, r.Body, 1048576) // 1MB limit
+	
 	var creds LoginRequest
-	if err := json.NewDecoder(r.Body).Decode(&creds); err != nil {
-		http.Error(w, "invalid request", http.StatusBadRequest)
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields() // Reject unknown fields
+	
+	if err := decoder.Decode(&creds); err != nil {
+		http.Error(w, "invalid request format", http.StatusBadRequest)
 		return
 	}
+	
+	// Basic input validation
+	if creds.Username == "" || creds.Password == "" {
+		http.Error(w, "username and password are required", http.StatusBadRequest)
+		return
+	}
+	
 	// For demo, I have used hard-coded credentials.
 	if creds.Username != "admin" || creds.Password != "password" {
 		http.Error(w, "unauthorized", http.StatusUnauthorized)

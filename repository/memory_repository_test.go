@@ -15,8 +15,8 @@ func TestMemoryServiceRepository_List(t *testing.T) {
 
 	testFields := fields{
 		services: map[int]*models.Service{
-			1: {ID: 1, Name: "Locate Us", Description: "Reach to Us", Versions: []string{"1.0.0", "1.1.0"}},
-			2: {ID: 2, Name: "Collect Money", Description: "recieve money", Versions: []string{"1.0.0"}},
+			1: {ID: 1, Name: "Locate Us", Description: "Reach to us", Versions: []string{"1.0.0", "1.1.0"}},
+			2: {ID: 2, Name: "Collect Money", Description: "receive money", Versions: []string{"1.0.0"}},
 			3: {ID: 3, Name: "Contact Us", Description: "our contact channels for customer support", Versions: []string{"1.0.0", "1.2.0"}},
 			4: {ID: 4, Name: "Notifications", Description: "updates to customers", Versions: []string{"2.0.0", "2.1.0"}},
 		},
@@ -83,8 +83,8 @@ func TestMemoryServiceRepository_GetByID(t *testing.T) {
 
 	testFields := fields{
 		services: map[int]*models.Service{
-			1: {ID: 1, Name: "Locate Us", Description: "Reach to Us", Versions: []string{"1.0.0", "1.1.0"}},
-			2: {ID: 2, Name: "Collect Money", Description: "recieve money", Versions: []string{"1.0.0"}},
+			1: {ID: 1, Name: "Locate Us", Description: "Reach to us", Versions: []string{"1.0.0", "1.1.0"}},
+			2: {ID: 2, Name: "Collect Money", Description: "receive money", Versions: []string{"1.0.0"}},
 			3: {ID: 3, Name: "Contact Us", Description: "our contact channels for customer support", Versions: []string{"1.0.0", "1.2.0"}},
 			4: {ID: 4, Name: "Notifications", Description: "updates to customers", Versions: []string{"2.0.0", "2.1.0"}},
 		},
@@ -105,7 +105,7 @@ func TestMemoryServiceRepository_GetByID(t *testing.T) {
 			want: &models.Service{
 				ID:          2,
 				Name:        "Collect Money",
-				Description: "recieve money",
+				Description: "receive money",
 				Versions:    []string{"1.0.0"},
 			},
 		},

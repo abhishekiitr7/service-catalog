@@ -50,11 +50,14 @@ func (r *SQLiteServiceRepository) CreateIfRequired() error {
 			{ID: 4, Name: "Notifications", Description: "updates to customers", Versions: []string{"2.0.0", "2.1.0"}},
 		}
 		for _, s := range seedServices {
-			vers, _ := json.Marshal(s.Versions)
-			_, err := r.db.Exec("INSERT INTO services (id, name, description, versions) VALUES (?, ?, ?, ?)",
+			vers, err := json.Marshal(s.Versions)
+			if err != nil {
+				return fmt.Errorf("failed to marshal versions for service %d: %v", s.ID, err)
+			}
+			_, err = r.db.Exec("INSERT INTO services (id, name, description, versions) VALUES (?, ?, ?, ?)",
 				s.ID, s.Name, s.Description, string(vers))
 			if err != nil {
-				return fmt.Errorf("failed to seed: %v", err)
+				return fmt.Errorf("failed to seed service %d: %v", s.ID, err)
 			}
 		}
 	}
@@ -84,7 +87,9 @@ func (r *SQLiteServiceRepository) List(searchTerm, sortBy, order string, limit, 
 		if err := rows.Scan(&s.ID, &s.Name, &s.Description, &versions); err != nil {
 			return nil, err
 		}
-		json.Unmarshal([]byte(versions), &s.Versions)
+		if err := json.Unmarshal([]byte(versions), &s.Versions); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal versions for service %d: %v", s.ID, err)
+		}
 		services = append(services, &s)
 	}
 	return services, nil
@@ -100,7 +105,9 @@ func (r *SQLiteServiceRepository) GetByID(id int) (*models.Service, error) {
 		}
 		return nil, err
 	}
-	json.Unmarshal([]byte(versions), &s.Versions)
+	if err := json.Unmarshal([]byte(versions), &s.Versions); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal versions for service %d: %v", s.ID, err)
+	}
 	return &s, nil
 }
 
@@ -114,6 +121,8 @@ func (r *SQLiteServiceRepository) GetVersions(id int) ([]string, error) {
 		return nil, err
 	}
 	var vers []string
-	json.Unmarshal([]byte(versions), &vers)
+	if err := json.Unmarshal([]byte(versions), &vers); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal versions for service %d: %v", id, err)
+	}
 	return vers, nil
 }
