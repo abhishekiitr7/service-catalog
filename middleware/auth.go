@@ -8,6 +8,26 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
+var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
+
+func init() {
+	validateJWTSecret()
+}
+
+func validateJWTSecret() {
+	if len(jwtSecret) == 0 {
+		panic("JWT_SECRET environment variable is required")
+	}
+	if len(jwtSecret) < 32 {
+		panic("JWT_SECRET must be at least 32 characters long for security")
+	}
+}
+
+// SetJWTSecretForTesting allows tests to override the JWT secret
+func SetJWTSecretForTesting(secret []byte) {
+	jwtSecret = secret
+}
+
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Allow public login
@@ -21,9 +41,8 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-		secret := []byte(os.Getenv("JWT_SECRET"))
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			return secret, nil
+			return jwtSecret, nil
 		})
 		if err != nil || !token.Valid {
 			http.Error(w, "Invalid token", http.StatusUnauthorized)

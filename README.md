@@ -13,7 +13,7 @@ All endpoints are secured with JWT authentication.
 
 ---
 
-## Design and TradeOffs
+## Design and Trade-offs
 - **Layers:** The code is split into handlers (HTTP layer), middleware (auth), and repository (data access). 
 - **In-Memory vs SQLite:**  
   - Default: In-memory map (simple, fast, resets on restart).  
@@ -36,27 +36,48 @@ All `/services` endpoints require a valid JWT.
 ---
 
 ## Running
+
 1. Install [Go](https://golang.org/dl/).  
+
 2. Set a JWT secret:  
+   
+   **For In-Memory DB:**
    ```bash
-   To Use In Memory DB:
-    export JWT_SECRET="mysecret"
+   export JWT_SECRET="your_32_character_secret_key_here"
+   ```
+   
+   **For Persistent DB (SQLite):**
+   ```bash
+   export USE_SQLITE=true
+   export JWT_SECRET="your_32_character_secret_key_here"
+   ```
 
-   To Use Persistence DB (SQLite):
-    export USE_SQLITE=true
-    export JWT_SECRET="mysecret"
+3. Start the server:
+   ```bash
+   go run main.go
+   ```
 
-3. Login (get JWT token):
-  curl -X POST http://localhost:8080/login \
-    -H "Content-Type: application/json" \
-    -d '{"username":"admin","password":"password"}'
+4. Login (get JWT token):
+   ```bash
+   curl -X POST http://localhost:8080/login \
+     -H "Content-Type: application/json" \
+     -d '{"username":"admin","password":"password"}'
+   ```
 
-4. List services (use token from login):
-  curl http://localhost:8080/services \
-    -H "Authorization: Bearer <your_token_here>"
+5. List services (use token from login):
+   ```bash
+   curl http://localhost:8080/services \
+     -H "Authorization: Bearer <your_token_here>"
+   ```
 
-5. With search + sort by name ascending
-  curl -H "Authorization: Bearer <your_token>" "http://localhost:8080/services?search=contact&sort=name&order=asc"
+6. With search + sort by name ascending:
+   ```bash
+   curl -H "Authorization: Bearer <your_token>" \
+     "http://localhost:8080/services?search=contact&sort=name&order=asc"
+   ```
 
-6. With search + pagination (limit 2, offset 0)
-  curl -H "Authorization: Bearer <your_token>" "http://localhost:8080/services?search=contact&limit=2&offset=0"
+7. With search + pagination (limit 2, offset 0):
+   ```bash
+   curl -H "Authorization: Bearer <your_token>" \
+     "http://localhost:8080/services?search=contact&limit=2&offset=0"
+   ```

@@ -11,6 +11,24 @@ import (
 
 var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
+func init() {
+	validateJWTSecret()
+}
+
+func validateJWTSecret() {
+	if len(jwtSecret) == 0 {
+		panic("JWT_SECRET environment variable is required")
+	}
+	if len(jwtSecret) < 32 {
+		panic("JWT_SECRET must be at least 32 characters long for security")
+	}
+}
+
+// SetJWTSecretForTesting allows tests to override the JWT secret
+func SetJWTSecretForTesting(secret []byte) {
+	jwtSecret = secret
+}
+
 type LoginRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
