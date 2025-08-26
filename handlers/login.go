@@ -36,11 +36,24 @@ type LoginRequest struct {
 
 // LoginHandler creates a JWT token for valid credential.
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	// Limit request body size to prevent large payload attacks
+	r.Body = http.MaxBytesReader(w, r.Body, 1048576) // 1MB limit
+	
 	var creds LoginRequest
-	if err := json.NewDecoder(r.Body).Decode(&creds); err != nil {
-		http.Error(w, "invalid request", http.StatusBadRequest)
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields() // Reject unknown fields
+	
+	if err := decoder.Decode(&creds); err != nil {
+		http.Error(w, "invalid request format", http.StatusBadRequest)
 		return
 	}
+	
+	// Basic input validation
+	if creds.Username == "" || creds.Password == "" {
+		http.Error(w, "username and password are required", http.StatusBadRequest)
+		return
+	}
+	
 	// For demo, I have used hard-coded credentials.
 	if creds.Username != "admin" || creds.Password != "password" {
 		http.Error(w, "unauthorized", http.StatusUnauthorized)
